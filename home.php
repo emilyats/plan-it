@@ -295,7 +295,7 @@ if ($role == 'Project Manager') {
                     </div>
                     <div class="form-group">
                         <label for="projectUsers">Assign Users</label>
-                        <select multiple class="form-control" id="projectUsers" name="user_ids[]">
+                        <select multiple class="form-control" id="projectUsers" name="employees[]">
                             <?php
                             $qry = $conn->query("SELECT id, username FROM users WHERE role != 'Admin' ORDER BY username ASC");
                             while ($row = $qry->fetch_assoc()):
@@ -350,7 +350,7 @@ if ($role == 'Project Manager') {
                     </div>
                     <div class="form-group">
                         <label for="editProjectUsers">Assign Users</label>
-                        <select multiple class="form-control" id="editProjectUsers" name="user_ids[]">
+                        <select multiple class="form-control" id="editProjectUsers" name="employees[]">
                             <?php
                             $qry = $conn->query("SELECT id, username FROM users WHERE role != 'Admin' ORDER BY username ASC");
                             while ($row = $qry->fetch_assoc()):
