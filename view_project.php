@@ -52,20 +52,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (isset($_POST['delete_task'])) {
         $delete_task_id = $_POST['delete_task_id'];
-
-        $stmt = $conn->prepare("DELETE FROM tasks WHERE task_id = ?");
-        $stmt->bind_param("i", $delete_task_id);
-        $stmt->execute();
-
-        if ($stmt->affected_rows > 0) {
-            $conn->query("DELETE FROM task_users WHERE task_id = $delete_task_id");
-            echo "<script>alert('Task deleted successfully!');</script>";
-            header("Refresh:0");
-        } else {
-            echo "Error deleting task: " . $stmt->error;
+    
+        // Start a transaction to ensure both deletions happen together
+        $conn->begin_transaction();
+    
+        try {
+            // Delete from task_users first
+            $stmt = $conn->prepare("DELETE FROM task_users WHERE task_id = ?");
+            $stmt->bind_param("i", $delete_task_id);
+            $stmt->execute();
+            $stmt->close();
+    
+            // Now delete from tasks
+            $stmt = $conn->prepare("DELETE FROM tasks WHERE task_id = ?");
+            $stmt->bind_param("i", $delete_task_id);
+            $stmt->execute();
+    
+            if ($stmt->affected_rows > 0) {
+                $conn->commit();
+                echo "<script>alert('Task deleted successfully!');</script>";
+                header("Refresh:0");
+            } else {
+                throw new Exception("Error deleting task: " . $stmt->error);
+            }
+    
+            $stmt->close();
+        } catch (Exception $e) {
+            $conn->rollback();
+            echo $e->getMessage();
         }
-
-        $stmt->close();
     }
 
     if (isset($_POST['create_task'])) {
@@ -165,7 +180,7 @@ if (isset($_GET['project_id'])) {
     }
     
     $result_tasks = $conn->query($query);
-    
+
     } else {
         header('Location: home.php');
         exit();
@@ -295,21 +310,21 @@ if (isset($_GET['project_id'])) {
                             <td><?php echo $row['due_date']; ?></td>
                             <td><?php echo $row['assigned_users']; ?></td>
                             <td class="action-buttons">
-                                <button 
-                                    onclick="editTask(
-                                        '<?php echo $row['task_id']; ?>', 
-                                        '<?php echo htmlspecialchars($row['title'], ENT_QUOTES); ?>', 
-                                        '<?php echo htmlspecialchars($row['description'], ENT_QUOTES); ?>', 
-                                        '<?php echo $row['priority']; ?>', 
-                                        '<?php echo $row['status']; ?>', 
-                                        '<?php echo $row['due_date']; ?>'
-                                    )" 
-                                    class="btn btn-primary btn-sm">Edit</button>
-                                <form method="post" action="">
-                                    <input type="hidden" name="delete_task_id" value="<?php echo $row['task_id']; ?>">
-                                    <button type="submit" name="delete_task" class="btn btn-danger btn-sm">Delete</button>
-                                </form>
-                            </td>
+                            <button 
+                                onclick="editTask(
+                                    '<?php echo $row['task_id']; ?>', 
+                                    '<?php echo htmlspecialchars($row['title'], ENT_QUOTES); ?>', 
+                                    '<?php echo htmlspecialchars($row['description'], ENT_QUOTES); ?>', 
+                                    '<?php echo $row['priority']; ?>', 
+                                    '<?php echo $row['status']; ?>', 
+                                    '<?php echo $row['due_date']; ?>'
+                                )" 
+                                class="btn btn-primary btn-sm">Edit</button>
+                            <button 
+                                type="button" 
+                                class="btn btn-danger btn-sm" 
+                                onclick="confirmDeleteTask('<?php echo $row['task_id']; ?>')">Delete</button>
+                        </td>
                         </tr>
                     <?php endwhile; ?>
                 <?php else: ?>
@@ -451,8 +466,37 @@ if (isset($_GET['project_id'])) {
         </div>
     </div>
 
+    <div class="modal fade" id="deleteTaskModal" tabindex="-1" role="dialog" aria-labelledby="deleteTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteTaskModalLabel">Delete Task</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this task?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <form method="post" action="">
+                        <input type="hidden" id="delete_task_id_modal" name="delete_task_id">
+                        <button type="submit" name="delete_task" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <script>
-    function clearFilters() {
+function confirmDeleteTask(taskId) {
+    document.getElementById('delete_task_id_modal').value = taskId;
+    $('#deleteTaskModal').modal('show');
+}
+
+function clearFilters() {
     document.getElementById('filter-form').reset();
 
     document.querySelectorAll('#filter-form select').forEach(select => {
@@ -462,33 +506,33 @@ if (isset($_GET['project_id'])) {
     document.getElementById('filter-form').submit();
 }
 
-    function editTask(id, title, description, priority, status, due_date) {
-        document.getElementById('edit_task_id').value = id;
-        document.getElementById('edit_title').value = title;
-        document.getElementById('edit_description').value = description;
-        document.getElementById('edit_priority').value = priority;
-        document.getElementById('edit_status').value = status;
-        document.getElementById('edit_due_date').value = due_date;
+function editTask(id, title, description, priority, status, due_date) {
+    document.getElementById('edit_task_id').value = id;
+    document.getElementById('edit_title').value = title;
+    document.getElementById('edit_description').value = description;
+    document.getElementById('edit_priority').value = priority;
+    document.getElementById('edit_status').value = status;
+    document.getElementById('edit_due_date').value = due_date;
 
-        $.ajax({
-            url: 'get_task_users.php',
-            type: 'GET',
-            data: { task_id: id },
-            success: function(response) {
-                $('#edit_assigned_users').val(JSON.parse(response));
-            },
-            error: function(xhr, status, error) {
-                console.error("AJAX error:", status, error);
-            }
-        });
+    $.ajax({
+        url: 'get_task_users.php',
+        type: 'GET',
+        data: { task_id: id },
+        success: function(response) {
+            $('#edit_assigned_users').val(JSON.parse(response));
+        },
+        error: function(xhr, status, error) {
+            console.error("AJAX error:", status, error);
+        }
+    });
 
-        $('#editTaskModal').modal('show');
-    }
+    $('#editTaskModal').modal('show');
+}
 
-    function showCreateTaskModal() {
-        $('#createTaskModal').modal('show');
-    }
-    </script>
+function showCreateTaskModal() {
+    $('#createTaskModal').modal('show');
+}
+</script>
 </body>
 </html>
 

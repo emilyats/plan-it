@@ -111,11 +111,12 @@ if ($role == 'Project Manager') {
                                     </td>
                                     <td><span class="badge badge-<?php echo strtolower(str_replace(' ', '-', $row['status'])); ?>"><?php echo $row['status']; ?></span></td>
                                     <td class="action-buttons">
-                                        <a class="btn btn-primary btn-sm" href="view_project.php?project_id=<?php echo $row['project_id']; ?>"><i class="fas fa-folder"></i> View Tasks</a>
-                                        <?php if ($role == 'Project Manager'): ?>
-                                            <button class="btn btn-secondary btn-sm edit-project-btn" data-toggle="modal" data-target="#editProjectModal" data-id="<?php echo $row['project_id']; ?>" data-name="<?php echo htmlspecialchars($row['name']); ?>" data-status="<?php echo $row['status']; ?>" data-start_date="<?php echo $row['start_date']; ?>" data-end_date="<?php echo $row['end_date']; ?>"><i class="fas fa-edit"></i> Edit</button>
-                                        <?php endif; ?>
-                                    </td>
+                                    <a class="btn btn-primary btn-sm" href="view_project.php?project_id=<?php echo $row['project_id']; ?>"><i class="fas fa-folder"></i> View Tasks</a>
+                                    <?php if ($role == 'Project Manager'): ?>
+                                        <button class="btn btn-secondary btn-sm edit-project-btn" data-toggle="modal" data-target="#editProjectModal" data-id="<?php echo $row['project_id']; ?>" data-name="<?php echo htmlspecialchars($row['name']); ?>" data-status="<?php echo $row['status']; ?>" data-start_date="<?php echo $row['start_date']; ?>" data-end_date="<?php echo $row['end_date']; ?>" data-user_ids="<?php echo implode(',', array_column($conn->query("SELECT employee_id FROM project_employees WHERE project_id = {$row['project_id']}")->fetch_all(MYSQLI_ASSOC), 'employee_id')); ?>"><i class="fas fa-edit"></i> Edit</button>
+                                        <button class="btn btn-danger btn-sm delete-project-btn" data-toggle="modal" data-target="#deleteProjectModal" data-id="<?php echo $row['project_id']; ?>"><i class="fas fa-trash"></i> Delete</button>
+                                    <?php endif; ?>
+                                </td>
                                 </tr>
                             <?php endwhile; ?>
                             </tbody>
@@ -292,6 +293,17 @@ if ($role == 'Project Manager') {
                         <label for="projectEndDate">End Date</label>
                         <input type="date" class="form-control" id="projectEndDate" name="end_date" required>
                     </div>
+                    <div class="form-group">
+                        <label for="projectUsers">Assign Users</label>
+                        <select multiple class="form-control" id="projectUsers" name="user_ids[]">
+                            <?php
+                            $qry = $conn->query("SELECT id, username FROM users WHERE role != 'Admin' ORDER BY username ASC");
+                            while ($row = $qry->fetch_assoc()):
+                            ?>
+                                <option value="<?php echo $row['id']; ?>"><?php echo htmlspecialchars($row['username']); ?></option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -301,6 +313,7 @@ if ($role == 'Project Manager') {
         </div>
     </div>
 </div>
+
 
 
 <div class="modal fade" id="editProjectModal" tabindex="-1" role="dialog" aria-labelledby="editProjectModalLabel" aria-hidden="true">
@@ -335,6 +348,17 @@ if ($role == 'Project Manager') {
                         <label for="editProjectEndDate">End Date</label>
                         <input type="date" class="form-control" id="editProjectEndDate" name="end_date" required>
                     </div>
+                    <div class="form-group">
+                        <label for="editProjectUsers">Assign Users</label>
+                        <select multiple class="form-control" id="editProjectUsers" name="user_ids[]">
+                            <?php
+                            $qry = $conn->query("SELECT id, username FROM users WHERE role != 'Admin' ORDER BY username ASC");
+                            while ($row = $qry->fetch_assoc()):
+                            ?>
+                                <option value="<?php echo $row['id']; ?>"><?php echo htmlspecialchars($row['username']); ?></option>
+                            <?php endwhile; ?>
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -345,6 +369,30 @@ if ($role == 'Project Manager') {
     </div>
 </div>
 
+<div class="modal fade" id="deleteProjectModal" tabindex="-1" role="dialog" aria-labelledby="deleteProjectModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" action="delete_project.php">
+                <input type="hidden" id="deleteProjectId" name="project_id">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteProjectModalLabel">Delete Project</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this project?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 <script>
     $(document).ready(function() {
         $('.edit-project-btn').on('click', function() {
@@ -353,12 +401,23 @@ if ($role == 'Project Manager') {
             var status = $(this).data('status');
             var start_date = $(this).data('start_date');
             var end_date = $(this).data('end_date');
+            var user_ids = $(this).data('user_ids');
 
             $('#editProjectId').val(id);
             $('#editProjectName').val(name);
             $('#editProjectStatus').val(status);
             $('#editProjectStartDate').val(start_date);
             $('#editProjectEndDate').val(end_date);
+
+            $('#editProjectUsers').val([]);
+            if (user_ids) {
+                $('#editProjectUsers').val(user_ids.split(','));
+            }
+        });
+
+        $('.delete-project-btn').on('click', function() {
+            var id = $(this).data('id');
+            $('#deleteProjectId').val(id);
         });
     });
 </script>

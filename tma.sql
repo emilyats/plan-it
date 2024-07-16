@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 16, 2024 at 11:41 PM
+-- Generation Time: Jul 17, 2024 at 01:38 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -88,8 +88,7 @@ CREATE TABLE `tasks` (
 
 INSERT INTO `tasks` (`task_id`, `project_id`, `title`, `description`, `priority`, `status`, `due_date`, `created_at`) VALUES
 (4, 1, 'Sample Task 1', 'wasd', 'Low', 'Completed', '2024-07-25', '2024-07-16 11:17:19'),
-(5, 1, 'Sample Task 2', 'xd', 'Medium', 'In Progress', '2024-07-24', '2024-07-16 14:39:55'),
-(6, 1, 'Sample Task 3', 'hey', 'High', 'In Progress', '2024-07-24', '2024-07-16 20:59:40');
+(5, 1, 'Sample Task 2', 'xd', 'Medium', 'In Progress', '2024-07-24', '2024-07-16 14:39:55');
 
 -- --------------------------------------------------------
 
@@ -111,8 +110,7 @@ INSERT INTO `task_users` (`id`, `task_id`, `user_id`) VALUES
 (9, 4, 3),
 (13, 5, 2),
 (14, 5, 3),
-(15, 5, 4),
-(16, 6, 3);
+(15, 5, 4);
 
 -- --------------------------------------------------------
 
@@ -136,7 +134,8 @@ INSERT INTO `users` (`id`, `username`, `password`, `role`, `created_at`) VALUES
 (1, 'admin', '$2y$10$1zHaZfMOGkj4NGNZnlr9lOPYvfRgHFTt3hpgagc7N7TewVFUTyoFy', 'Admin', '2024-07-07 14:53:02'),
 (2, 'emily', '$2y$10$c3TvymNdOlzYLGFCwVkHo.SDP8ksjnzWsn6fg38ztH2N8sxZyWWNa', 'Project Manager', '2024-07-07 14:58:38'),
 (3, 'user1', '$2y$10$vU6SAEwHipYn.o9ukpy0YO/j6Tp3C9JpWcN1wYfuR9//nad4J7TMa', 'Employee', '2024-07-08 03:19:21'),
-(4, 'user2', '$2y$10$Xt9quka7LKH/GA.LBEgrsOQasGJ8fiJ7ew4C2hjPiP3kusuR5t8lu', 'Employee', '2024-07-08 03:23:34');
+(4, 'user2', '$2y$10$Xt9quka7LKH/GA.LBEgrsOQasGJ8fiJ7ew4C2hjPiP3kusuR5t8lu', 'Employee', '2024-07-08 03:23:34'),
+(5, 'wasd', '$2y$10$n7IDjpXY0lxKwwGrPZKU6Oc0c4sY2pXhLmRH/V047uPF9CxNXz0VG', 'Employee', '2024-07-16 23:20:48');
 
 --
 -- Indexes for dumped tables
@@ -186,25 +185,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `projects`
 --
 ALTER TABLE `projects`
-  MODIFY `project_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `project_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `tasks`
 --
 ALTER TABLE `tasks`
-  MODIFY `task_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `task_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `task_users`
 --
 ALTER TABLE `task_users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
