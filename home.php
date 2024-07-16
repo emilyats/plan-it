@@ -62,10 +62,10 @@ if ($role == 'Project Manager') {
                     <h2>Welcome to <?php echo $_SESSION['system']['site_name']; ?>, <?php echo htmlspecialchars($_SESSION['user']); ?>!</h2>
                     <p>Role: <?php echo htmlspecialchars($role); ?></p>
                     <?php if ($role == 'Project Manager'): ?>
-                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#newProjectModal">New Project</button>
+                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#newProjectModal">New Project</button>
                     <?php endif; ?>
-                    <a href="logout.php" class="btn btn-secondary">Logout</a>
                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#reportModal">Generate Project Report</button>
+                    <a href="logout.php" class="btn btn-secondary">Logout</a>
                 </div>
             </div>
         </div>
