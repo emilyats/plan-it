@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jul 17, 2024 at 01:38 AM
+-- Generation Time: Jul 17, 2024 at 02:48 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -42,8 +42,7 @@ CREATE TABLE `projects` (
 --
 
 INSERT INTO `projects` (`project_id`, `user_id`, `name`, `status`, `created_at`, `start_date`, `end_date`) VALUES
-(1, 2, 'Sample Project', 'In Progress', '2024-07-08 03:52:52', '2024-07-09', '2024-07-31'),
-(2, 2, 'Sample Project 2', 'In Progress', '2024-07-08 05:27:14', '2024-07-09', '2024-07-31');
+(1, 2, 'Sample Project', 'In Progress', '2024-07-08 03:52:52', '2024-07-09', '2024-07-31');
 
 -- --------------------------------------------------------
 
@@ -62,8 +61,7 @@ CREATE TABLE `project_employees` (
 
 INSERT INTO `project_employees` (`project_id`, `employee_id`) VALUES
 (1, 3),
-(1, 4),
-(2, 4);
+(1, 4);
 
 -- --------------------------------------------------------
 
@@ -108,9 +106,8 @@ CREATE TABLE `task_users` (
 
 INSERT INTO `task_users` (`id`, `task_id`, `user_id`) VALUES
 (9, 4, 3),
-(13, 5, 2),
-(14, 5, 3),
-(15, 5, 4);
+(18, 5, 3),
+(19, 5, 4);
 
 -- --------------------------------------------------------
 
@@ -134,8 +131,7 @@ INSERT INTO `users` (`id`, `username`, `password`, `role`, `created_at`) VALUES
 (1, 'admin', '$2y$10$1zHaZfMOGkj4NGNZnlr9lOPYvfRgHFTt3hpgagc7N7TewVFUTyoFy', 'Admin', '2024-07-07 14:53:02'),
 (2, 'emily', '$2y$10$c3TvymNdOlzYLGFCwVkHo.SDP8ksjnzWsn6fg38ztH2N8sxZyWWNa', 'Project Manager', '2024-07-07 14:58:38'),
 (3, 'user1', '$2y$10$vU6SAEwHipYn.o9ukpy0YO/j6Tp3C9JpWcN1wYfuR9//nad4J7TMa', 'Employee', '2024-07-08 03:19:21'),
-(4, 'user2', '$2y$10$Xt9quka7LKH/GA.LBEgrsOQasGJ8fiJ7ew4C2hjPiP3kusuR5t8lu', 'Employee', '2024-07-08 03:23:34'),
-(5, 'wasd', '$2y$10$n7IDjpXY0lxKwwGrPZKU6Oc0c4sY2pXhLmRH/V047uPF9CxNXz0VG', 'Employee', '2024-07-16 23:20:48');
+(4, 'user2', '$2y$10$Xt9quka7LKH/GA.LBEgrsOQasGJ8fiJ7ew4C2hjPiP3kusuR5t8lu', 'Employee', '2024-07-08 03:23:34');
 
 --
 -- Indexes for dumped tables
@@ -197,7 +193,7 @@ ALTER TABLE `tasks`
 -- AUTO_INCREMENT for table `task_users`
 --
 ALTER TABLE `task_users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `users`

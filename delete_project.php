@@ -10,16 +10,12 @@ if (!isset($_SESSION['logged-in']) || $_SESSION['role'] !== 'Project Manager') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $project_id = $conn->real_escape_string($_POST['project_id']);
 
-    // First, delete task assignments
     $conn->query("DELETE FROM task_users WHERE task_id IN (SELECT task_id FROM tasks WHERE project_id = '$project_id')");
 
-    // Next, delete tasks
     $conn->query("DELETE FROM tasks WHERE project_id = '$project_id'");
 
-    // Then, delete project assignments
     $conn->query("DELETE FROM project_employees WHERE project_id = '$project_id'");
 
-    // Finally, delete the project
     $conn->query("DELETE FROM projects WHERE project_id = '$project_id'");
 
     header('Location: index.php');

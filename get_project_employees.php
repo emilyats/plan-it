@@ -7,18 +7,12 @@ if (!isset($_SESSION['logged-in'])) {
 
 include 'db_connect.php';
 
-if ($_SESSION['role'] !== 'Project Manager') {
-    header('Location: unauthorized.php');
-    exit();
-}
-
 if (!isset($_GET['project_id'])) {
     echo "Project ID is not set.";
     exit();
 }
 
 $project_id = $_GET['project_id'];
-
 $employees = [];
 $result = $conn->query("SELECT employee_id FROM project_employees WHERE project_id = $project_id");
 
